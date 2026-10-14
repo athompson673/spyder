@@ -292,6 +292,9 @@ DEFAULTS = [
                   'add_remove_cursor': 'Ctrl+Alt',
                   'column_cursor': 'Ctrl+Alt+Shift'
               },
+              'user_file_extensions': {},
+              #populate from spyder\plugins\editor\utils\languages.py if empty
+              'set_language_menu_options': {},
               }),
             ('historylog',
              {
