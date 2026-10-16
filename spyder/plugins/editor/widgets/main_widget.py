@@ -2513,6 +2513,12 @@ class EditorMainWidget(PluginMainWidget):
         editor = self.get_current_editor()
         if editor is not None:
             editor.collapse_expand_current_region()
+            
+    def set_override_language(self, language):
+        self.switch_to_plugin()
+        editorstack = self.get_current_editorstack()
+        finfo = editorstack.get_current_finfo()
+        editorstack.rename_in_data(finfo.filename, finfo.filename, language)
 
     # ---- Cursor position history management
     # -------------------------------------------------------------------------
