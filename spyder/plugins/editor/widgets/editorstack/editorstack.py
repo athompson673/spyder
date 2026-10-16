@@ -1281,7 +1281,9 @@ class EditorStack(SpyderWidgetMixin, QWidget):
             self.tabs.setTabToolTip(index, tab_tip)
         self.tabs.blockSignals(False)
 
-    def rename_in_data(self, original_filename, new_filename):
+    def rename_in_data(
+            self, original_filename, new_filename, override_lang=None
+        ):
         index = self.has_filename(original_filename)
         if index is None:
             return
@@ -1296,11 +1298,11 @@ class EditorStack(SpyderWidgetMixin, QWidget):
         # File type has changed!
         original_ext = osp.splitext(original_filename)[1]
         new_ext = osp.splitext(new_filename)[1]
-        if original_ext != new_ext:
+        if (original_ext != new_ext) or override_lang:
             # Set file language and re-run highlighter
             txt = str(finfo.editor.get_text_with_eol())
-            language = get_file_language(new_filename, txt)
-            finfo.editor.set_language(language, new_filename)
+            language = override_lang or get_file_language(new_filename, txt)
+            finfo.editor.set_language(language, new_filename, override_lang)
             finfo.editor.run_pygments_highlighter()
 
             # If the user renamed the file to a different language, we
