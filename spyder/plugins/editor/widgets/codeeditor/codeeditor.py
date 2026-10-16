@@ -34,6 +34,7 @@ from IPython.core.inputtransformer2 import TransformerManager
 import nbformat as nbformat
 from nbconvert import PythonExporter as nbexporter
 from packaging.version import parse
+from pygments.lexers import get_lexer_by_name
 from qtpy import QT_VERSION
 from qtpy.QtCore import (
     QEvent, QRegularExpression, Qt, QTimer, QUrl, Signal, Slot)
@@ -1175,7 +1176,7 @@ class CodeEditor(
         else:
             self.unhighlight_current_cell()
 
-    def set_language(self, language, filename=None):
+    def set_language(self, language, filename=None, override_lang=None):
         extra_supported_languages = {'stil': 'STIL'}
         self.tab_indents = language in self.TAB_ALWAYS_INDENTS
         self.comment_string = ''
@@ -1198,7 +1199,17 @@ class CodeEditor(
                         self.has_cell_separators = True
                     break
 
-        if filename is not None and not self.supported_language:
+        if override_lang and not self.supported_language:
+            try:
+                lexer = get_lexer_by_name(override_lang)
+                class OverridePygmentsSH(sh.PygmentsSH):
+                    _lexer = lexer
+                sh_class = OverridePygmentsSH
+            except Exception:
+                sh_class = sh.TextSH
+            self.language = sh_class._lexer.name
+            
+        elif filename is not None and not self.supported_language:
             sh_class = sh.guess_pygments_highlighter(filename)
             self.support_language = sh_class is not sh.TextSH
             if self.support_language:
